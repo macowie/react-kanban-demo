@@ -1,20 +1,17 @@
 import React from 'react';
-import logo from './logo.svg';
-
-import {
-  AppContainer,
-  ColumnContainer,
-  ColumnTitle,
-  CardContainer
-} from "./styles"
-
+import { useAppState } from "./state/AppStateContext"
+import { AppContainer } from "./styles"
 import { Column } from "./Column"
 import { AddNewItem } from "./AddNewItem"
 
 export const App = () => {
+  const { lists } = useAppState()
+
   return (
     <AppContainer>
-      <Column text="Todo:" />
+      {lists.map((list) => (
+        <Column text={list.text} key={list.id} id={list.id} />
+      ))}
       <AddNewItem
         toggleButtonText="+ Add another list"
         onAdd={console.log}
