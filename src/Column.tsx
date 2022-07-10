@@ -1,20 +1,24 @@
+import { useRef } from "react"
+import { useDrop } from "react-dnd"
+import { throttle } from "throttle-debounce-ts"
+
 import { ColumnContainer, ColumnTitle } from "./styles"
 import { AddNewItem } from "./AddNewItem"
 import { Card } from "./Card"
-import { useAppState } from "./state/AppStateContext"
 
-import { useRef } from "react"
-import { useItemDrag } from "./utils/useItemDrag"
-import { useDrop } from "react-dnd"
+import { useAppState } from "./state/AppStateContext"
 import { moveList, addTask } from "./state/actions"
-import { throttle } from "throttle-debounce-ts"
+
+import { useItemDrag } from "./utils/useItemDrag"
+import { isHidden } from "./utils/isHidden"
 
 type ColumnProps = {
   text: string
   id: string
+  isPreview?: boolean
 }
 
-export const Column = ({ text, id }: ColumnProps) => {
+export const Column = ({ text, id, isPreview }: ColumnProps) => {
   const { draggedItem, getTasksByListId, dispatch } = useAppState()
   const tasks = getTasksByListId(id)
   const ref = useRef<HTMLDivElement>(null)
@@ -39,10 +43,14 @@ export const Column = ({ text, id }: ColumnProps) => {
   drag(drop(ref))
 
   return (
-    <ColumnContainer ref={ref}>
+    <ColumnContainer
+      ref={ref}
+      isHidden={isHidden(draggedItem, "COLUMN", id, isPreview)}
+      isPreview={isPreview}
+    >
       <ColumnTitle>{text}</ColumnTitle>
       {tasks.map((task) => (
-        <Card text={task.text} key={task.id} id={task.id} />
+        <Card text={task.text} key={task.id} id={task.id} columnId={id} />
       ))}
       <AddNewItem
         toggleButtonText="+ Add another card"
