@@ -7,7 +7,7 @@ import { AddNewItem } from "./AddNewItem"
 import { Card } from "./Card"
 
 import { useAppState } from "./state/AppStateContext"
-import { moveList, addTask } from "./state/actions"
+import { moveList, addTask, moveTask, setDraggedItem } from "./state/actions"
 
 import { useItemDrag } from "./utils/useItemDrag"
 import { isHidden } from "./utils/isHidden"
@@ -25,7 +25,7 @@ export const Column = ({ text, id, isPreview }: ColumnProps) => {
 
   const { drag } = useItemDrag({ type: "COLUMN", id, text })
   const [, drop] = useDrop({
-    accept: "COLUMN",
+    accept: ["COLUMN", "CARD"],
     hover: throttle(200, () => {
       if (!draggedItem) {
         return
@@ -36,6 +36,18 @@ export const Column = ({ text, id, isPreview }: ColumnProps) => {
         }
 
         dispatch(moveList(draggedItem.id, id))
+      } else {
+        if (draggedItem.columnId === id) {
+          return
+        }
+        if (tasks.length) {
+          return
+        }
+
+        dispatch(
+          moveTask(draggedItem.id, null, draggedItem.columnId, id)
+        )
+        dispatch(setDraggedItem({ ...draggedItem, columnId: id }))
       }
     })
   })
